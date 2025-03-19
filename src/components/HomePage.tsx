@@ -3,14 +3,15 @@
 import { useEffect, useCallback, useState } from "react";
 import sdk, { type FrameContext } from "@farcaster/frame-sdk";
 import { motion } from "framer-motion";
-import { Menu, X } from "lucide-react";
 import Image from "next/image";
 import { FaFootballBall } from "react-icons/fa";
+import Header from "./Header";
+import BackgroundLogos from "./BackgroundLogos"; // Import reusable background
+import Link from "next/link";
 
 export default function HomePage() {
   const [isSDKLoaded, setIsSDKLoaded] = useState(false);
   const [context, setContext] = useState<FrameContext>();
-  const [menuOpen, setMenuOpen] = useState(false);
 
   useEffect(() => {
     const load = async () => {
@@ -22,10 +23,6 @@ export default function HomePage() {
       load();
     }
   }, [isSDKLoaded]);
-
-  const toggleMenu = () => {
-    setMenuOpen((prev) => !prev);
-  };
 
   // Sample EPL player images (replace with actual URLs)
   const playerImages = [
@@ -39,66 +36,17 @@ export default function HomePage() {
   const spacing = 16;
   const totalWidthPerSet = playerImages.length * (imageWidth + spacing);
 
-  // Positions for the 7 degen-logos
-  const logoPositions = [
-    { top: "10%", left: "15%" },
-    { top: "25%", left: "70%" },
-    { top: "40%", left: "30%" },
-    { top: "55%", left: "85%" },
-    { top: "70%", left: "20%" },
-    { top: "85%", left: "60%" },
-    { top: "15%", left: "45%" },
-  ];
-
   if (!isSDKLoaded) {
     return <div className="text-center mt-10">Loading...</div>;
   }
 
   return (
-    <div className="relative h-screen bg-gradient-to-b from-gray-200 via-white to-gray-400 text-white flex flex-col overflow-hidden">
-      {/* Background Degen Logos */}
-      {logoPositions.map((pos, index) => (
-        <motion.div
-          key={index}
-          className="absolute"
-          style={{ top: pos.top, left: pos.left }}
-          initial={{ rotate: 0 }}
-          animate={{ rotate: 360 }}
-          transition={{ duration: 4, repeat: Infinity, ease: "linear" }}
-        >
-          <Image
-            src="/degen-logo.png"
-            alt="Degen Logo"
-            width={30}
-            height={30}
-            className="opacity-30"
-          />
-        </motion.div>
-      ))}
+    <div className="relative min-h-screen bg-gradient-to-b from-gray-200 via-white to-gray-400 text-white flex flex-col"> {/* Removed h-screen and overflow-hidden */}
+      {/* Reusable Background Degen Logos */}
+      <BackgroundLogos />
 
       {/* Header */}
-      <header className="flex justify-between items-center w-full max-w-3xl mx-auto p-4 relative z-10">
-        <motion.div
-          className="flex items-center gap-2"
-          initial={{ opacity: 0, x: -50 }}
-          animate={{ opacity: 1, x: 0 }}
-        >
-          <Image src="/user-pfp.png" alt="User PFP" width={40} height={40} className="rounded-full" />
-          <div>
-            <p className="text-sm font-semibold text-gray-800">Username</p>
-            <p className="text-xs text-gray-600">Points: 100</p>
-          </div>
-        </motion.div>
-
-        <div className="flex items-center gap-2">
-          <Image src="/degen-logo.png" alt="Degen Logo" width={24} height={24} />
-          <h1 style={{ color: "var(--app-color)" }} className="text-xl font-bold">Degen Picks</h1>
-        </div>
-
-        <button onClick={toggleMenu} className="p-2">
-          {menuOpen ? <X size={28} className="text-gray-800" /> : <Menu size={28} className="text-gray-800" />}
-        </button>
-      </header>
+      <Header />
 
       {/* Background Football Animation */}
       <motion.div
@@ -112,59 +60,45 @@ export default function HomePage() {
 
       {/* Main Content */}
       <div className="flex-1 flex flex-col w-full">
-        {menuOpen && (
-          <motion.nav
-            initial={{ x: 100 }}
-            animate={{ x: 0 }}
-            exit={{ x: 100 }}
-            className="absolute top-16 right-4 bg-gray-800 p-4 rounded-lg shadow-lg z-20"
-          >
-            <ul className="space-y-2">
-              <li className="hover:text-yellow-400 cursor-pointer text-white">Home</li>
-              <li className="hover:text-yellow-400 cursor-pointer text-white">Profile</li>
-              <li className="hover:text-yellow-400 cursor-pointer text-white">Earn</li>
-            </ul>
-          </motion.nav>
-        )}
-
         {/* Prediction Section */}
         <section className="p-4 text-center relative z-10">
           <motion.h1
-            className="text-4xl font-bold mb-4 text-gray-800"
+            className="text-4xl font-bold mb-8 text-gray-800"
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
-            style={{ color: "var(--app-color)" }}
           >
             PREMIER LEAGUE 2024/2025
           </motion.h1>
           <motion.div
-            className="mb-4"
+            className="mb-8"
             initial={{ opacity: 0, scale: 0.9 }}
             animate={{ opacity: 1, scale: 1 }}
             transition={{ delay: 0.2 }}
           >
             <Image
-              src="/epl-logo.jpg" // Adjust path as needed
+              src="/epl-logo.png"
               alt="EPL Logo"
               width={60}
               height={60}
               className="rounded-full mx-auto"
             />
           </motion.div>
-          <p className="text-lg text-gray-600 mb-4">
-            Predict correct scores, Earn Points & Rewards in $DEGEN
+          <p className="text-lg text-gray-600 mb-8">
+            Predict correct scores, earn points and add the remaining
           </p>
-          <motion.button
-            style={{ backgroundColor: "var(--app-color)" }}
-            className="px-6 py-3 text-white font-bold rounded-lg shadow-lg hover:bg-opacity-90 transition mb-4"
-            initial={{ opacity: 0, scale: 0.9 }}
-            animate={{ opacity: 1, scale: 1 }}
-            whileHover={{ scale: 1.05 }}
-          >
-            Start Predicting
-          </motion.button>
+          <Link href="/predict">
+            <motion.button
+              style={{ backgroundColor: "var(--app-color)" }}
+              className="px-6 py-3 text-white font-bold rounded-lg shadow-lg hover:bg-opacity-90 transition mb-8"
+              initial={{ opacity: 0, scale: 0.9 }}
+              animate={{ opacity: 1, scale: 1 }}
+              whileHover={{ scale: 1.05 }}
+            >
+              Start Predicting
+            </motion.button>
+          </Link>
 
-          <p className="mt-4 text-sm text-gray-600">
+          <p className="mt-6 text-sm text-gray-600">
             Matchday 25 - Predictions Close in 2h 30m
           </p>
         </section>
@@ -210,6 +144,19 @@ export default function HomePage() {
               </div>
             ))}
           </motion.div>
+        </section>
+
+        {/* How to Play Section */}
+        <section className="p-4 text-center relative z-10">
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">How to Play</h2>
+          <p className="text-gray-600 mb-6">
+            Placeholder: Instructions on how to predict scores and participate in Degen Picks.
+          </p>
+
+          <h2 className="text-2xl font-bold text-gray-800 mb-4">How Points Are Given</h2>
+          <p className="text-gray-600">
+            Placeholder: Explanation of the points system for correct predictions.
+          </p>
         </section>
       </div>
     </div>
